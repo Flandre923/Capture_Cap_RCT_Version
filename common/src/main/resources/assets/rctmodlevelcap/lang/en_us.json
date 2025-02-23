@@ -1,0 +1,9 @@
+{
+  "catchlevelcap.fail_message": "It seems is too strong to be caught... levelcap(%s)",
+  "catchlevelcap.fail_message_external": "The ball bounced off... try battling first? levelcap(%s)",
+  "catchlevelcap.fail_message_battle": "The ball had no effect on ... levelcap(%s)",
+
+  "gamerule.levelCap": "In battle level cap",
+  "gamerule.externalLevelCap": "Out of battle level cap",
+  "gamerule.showLevelCapMessages": "Show level cap messages"
+}
