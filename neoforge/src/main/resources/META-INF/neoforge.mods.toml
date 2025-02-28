@@ -33,7 +33,7 @@ license="${license}"
   side="BOTH"
 
 [[dependencies.${mod_id}]]
-  modId="rctapi"
+  modId="rctmod"
   mandatory=true
   versionRange="[${rctmod_min_version},)"
   ordering="NONE"

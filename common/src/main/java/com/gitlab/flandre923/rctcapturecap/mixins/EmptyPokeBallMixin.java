@@ -1,7 +1,13 @@
 package com.gitlab.flandre923.rctcapturecap.mixins;
 
+import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
+import com.cobblemon.mod.common.battles.ActiveBattlePokemon;
+import com.cobblemon.mod.common.battles.BattleCaptureAction;
 import com.cobblemon.mod.common.entity.pokeball.EmptyPokeBallEntity;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
+import com.cobblemon.mod.common.net.messages.client.battle.BattleCaptureEndPacket;
+import com.cobblemon.mod.common.util.PlayerExtensionsKt;
+import com.cobblemon.mod.common.util.WorldExtensionsKt;
 import com.gitlab.flandre923.rctcapturecap.LevelCapGetHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -49,12 +55,33 @@ public abstract class EmptyPokeBallMixin {
                 boolean showMessages = gamerules.getBoolean(SHOW_LEVEL_CAP_MESSAGES);
 
                 if (targetLevel > playerLevel + levelCap) {
+                    if(capturingPokemon.isBattling()){
+                        PokemonBattle battle = PlayerExtensionsKt.getBattleState(player).component1();
+                        ActiveBattlePokemon hitBattlePokemon = null;
+                        if(battle != null) {
+                            for (ActiveBattlePokemon battlePokemon : battle.getActor(player).getSide().getOppositeSide().getActivePokemon()) {
+                                if (battlePokemon.getBattlePokemon().getEffectedPokemon().getEntity() == capturingPokemon) {
+                                    hitBattlePokemon = battlePokemon;
+                                }
+                            }
+                        }
+
+                        if (hitBattlePokemon != null) {
+                            battle.sendUpdate(new BattleCaptureEndPacket(hitBattlePokemon.getPNX(), false));
+                            BattleCaptureAction captureAction = null;
+                            for(BattleCaptureAction action : battle.getCaptureActions()) {
+                                if(action.getPokeBallEntity() == self) captureAction = action;
+                            }
+                            if(captureAction != null) {
+                                battle.finishCaptureAction(captureAction);
+                            }
+                        }
+                    }
                     if (showMessages) {
                         player.sendSystemMessage(Component.translatableWithFallback("catchlevelcap.fail_message","It seems is too strong to be caught... levelcap(%s)", playerLevel+levelCap)
                                 .withStyle(style -> style.withColor(TextColor.fromRgb(0xFF0000))),true);
                     }
-
-                    self.level().playSound(null, self.blockPosition(), SoundEvents.ITEM_BREAK, SoundSource.NEUTRAL, 0.8F, 1F);
+                    WorldExtensionsKt.playSoundServer(self.level(), self.position(), SoundEvents.ITEM_BREAK, SoundSource.NEUTRAL, 0.8F, 1F);
                     drop();
                     ci.cancel();
                 }

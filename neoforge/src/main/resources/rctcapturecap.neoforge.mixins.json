@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "package": "${maven_group}.${mod_id}.mixins",
   "mixins": [
+    "EmptyPokeBallMixin"
   ],
   "injectors": {
     "defaultRequire": 1

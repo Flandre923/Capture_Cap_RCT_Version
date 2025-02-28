@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License along
  * with Radical Cobblemon Trainers. If not, see <http://www.gnu.org/licenses/lgpl>.
  */
-package com.gitlab.flandre923.rctcapturecap.forge;
+package com.gitlab.flandre923.rctcapturecap.neoforge;
 
 import com.gitlab.flandre923.rctcapturecap.ModCommon;
 import net.neoforged.fml.ModContainer;
@@ -24,6 +24,6 @@ import net.neoforged.fml.common.Mod;
 @Mod(ModCommon.MOD_ID)
 public class NeoForgeCommon {
     public NeoForgeCommon(ModContainer container) {
+        ModCommon.init();
     }
-
 }

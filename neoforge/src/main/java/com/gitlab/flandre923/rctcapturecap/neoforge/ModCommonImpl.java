@@ -1,4 +1,4 @@
-package com.gitlab.flandre923.rctcapturecap.forge;
+package com.gitlab.flandre923.rctcapturecap.neoforge;
 
 import net.minecraft.world.level.GameRules;
 
