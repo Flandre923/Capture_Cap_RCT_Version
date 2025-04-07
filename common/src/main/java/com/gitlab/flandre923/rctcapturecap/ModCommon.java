@@ -28,10 +28,13 @@ public class ModCommon {
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
     public static final GameRules.Key<GameRules.BooleanValue> SHOW_LEVEL_CAP_MESSAGES;
     public static final GameRules.Key<GameRules.IntegerValue> LEVEL_CAP;
-
+    public static final GameRules.Key<GameRules.BooleanValue> BYPASS_SHINY;
+    public static final GameRules.Key<GameRules.BooleanValue> BYPASS_MASTER_BALL;
     static {
         LEVEL_CAP = registerIntRule("levelCap", GameRules.Category.MISC, 0);
         SHOW_LEVEL_CAP_MESSAGES = registerBooleanRule("showLevelCapMessages", GameRules.Category.MISC, true);
+        BYPASS_SHINY = registerBooleanRule("bypassShiny", GameRules.Category.MISC, true);
+        BYPASS_MASTER_BALL = registerBooleanRule("bypassMasterBall", GameRules.Category.MISC, true);
     }
     public static void init() {
 //        ModItems.register();

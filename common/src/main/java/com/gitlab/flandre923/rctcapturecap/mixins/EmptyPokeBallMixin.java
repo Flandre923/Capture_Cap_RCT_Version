@@ -22,9 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.gitlab.flandre923.rctcapturecap.ModCommon.LEVEL_CAP;
-import static com.gitlab.flandre923.rctcapturecap.ModCommon.SHOW_LEVEL_CAP_MESSAGES;
-
+import static com.gitlab.flandre923.rctcapturecap.ModCommon.*;
 @Mixin(EmptyPokeBallEntity.class)
 public abstract class EmptyPokeBallMixin {
 
@@ -45,16 +43,27 @@ public abstract class EmptyPokeBallMixin {
         EmptyPokeBallEntity self = (EmptyPokeBallEntity) (Object) this;
 
         if (self.getOwner() instanceof ServerPlayer player) {
-            if (!player.isCreative() && !self.getPokeBall().getCatchRateModifier().isGuaranteed() && !capturingPokemon.getPokemon().getShiny()) {
+            GameRules gamerules = self.level().getGameRules();
+            boolean bypassShinyRule = gamerules.getBoolean(BYPASS_SHINY);
+            boolean bypassMasterBallRule = gamerules.getBoolean(BYPASS_MASTER_BALL);
 
+            boolean isShiny = capturingPokemon.getPokemon().getShiny();
+            // Use isGuaranteed() as a proxy for Master Ball behavior, configurable via the rule.
+            boolean isGuaranteedCatch = self.getPokeBall().getCatchRateModifier().isGuaranteed();
+
+            // Determine if the level cap should be applied
+            boolean shouldApplyCap = !player.isCreative() &&
+                                     !(bypassShinyRule && isShiny) &&
+                                     !(bypassMasterBallRule && isGuaranteedCatch);
+
+            if (shouldApplyCap) {
                 int playerLevel = LevelCapGetHelper.getLevelCap(player);
                 int targetLevel = capturingPokemon.getPokemon().getLevel();
-
-                GameRules gamerules = self.level().getGameRules();
                 int levelCap = gamerules.getInt(LEVEL_CAP);
                 boolean showMessages = gamerules.getBoolean(SHOW_LEVEL_CAP_MESSAGES);
 
                 if (targetLevel > playerLevel + levelCap) {
+                    // Existing logic for handling failed capture due to level cap
                     if(capturingPokemon.isBattling()){
                         PokemonBattle battle = PlayerExtensionsKt.getBattleState(player).component1();
                         ActiveBattlePokemon hitBattlePokemon = null;
@@ -62,19 +71,18 @@ public abstract class EmptyPokeBallMixin {
                             for (ActiveBattlePokemon battlePokemon : battle.getActor(player).getSide().getOppositeSide().getActivePokemon()) {
                                 if (battlePokemon.getBattlePokemon().getEffectedPokemon().getEntity() == capturingPokemon) {
                                     hitBattlePokemon = battlePokemon;
+                                    break; // Found the matching Pokemon
                                 }
                             }
                         }
 
                         if (hitBattlePokemon != null) {
                             battle.sendUpdate(new BattleCaptureEndPacket(hitBattlePokemon.getPNX(), false));
-                            BattleCaptureAction captureAction = null;
-                            for(BattleCaptureAction action : battle.getCaptureActions()) {
-                                if(action.getPokeBallEntity() == self) captureAction = action;
-                            }
-                            if(captureAction != null) {
-                                battle.finishCaptureAction(captureAction);
-                            }
+                            // Find and finish the specific capture action associated with this PokeBall
+                            battle.getCaptureActions().stream()
+                                    .filter(action -> action.getPokeBallEntity() == self)
+                                    .findFirst()
+                                    .ifPresent(battle::finishCaptureAction);
                         }
                     }
                     if (showMessages) {
