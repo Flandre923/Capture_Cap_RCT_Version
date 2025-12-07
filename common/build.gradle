@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "2.0.0"
+    id "org.jetbrains.kotlin.jvm" version "2.2.0"
 }
 
 loom {
@@ -23,7 +23,7 @@ dependencies {
 
     modApi "com.cobblemon:mod:$rootProject.cobblemon_version"
 
-    implementation "org.jetbrains.kotlin:kotlin-reflect:2.0.0"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:2.2.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$rootProject.kotlin_stdlib_version"
     // modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-common:${fcap_version}"
     compileOnly "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:$rootProject.fcap_version"//source: https://github.com/Fuzss/forgeconfigapiport-fabric
